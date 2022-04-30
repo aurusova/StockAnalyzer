@@ -2,7 +2,7 @@ package yahooApi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import yahooApi.beans.Asset;
+import stockanalyzer.ui.YahooException;
 import yahooApi.beans.YahooResponse;
 
 import javax.json.*;
@@ -10,7 +10,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +17,7 @@ public class YahooFinance {
 
     public static final String URL_YAHOO = "https://query1.finance.yahoo.com/v7/finance/quote?symbols=%s";
 
-    public String requestData(List<String> tickers) {
-        //TODO improve Error Handling
+    public String requestData(List<String> tickers) throws YahooException {
         String symbols = String.join(",", tickers);
         String query = String.format(URL_YAHOO, symbols);
         System.out.println(query);
@@ -28,19 +26,30 @@ public class YahooFinance {
             obj = new URL(query);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            throw new YahooException("URL not correct!");
         }
         HttpURLConnection con = null;
         StringBuilder response = new StringBuilder();
+        BufferedReader in = null;
+
         try {
             con = (HttpURLConnection) obj.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
             in.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new YahooException("No internet connection!");
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Failed to close file");
+            }
         }
         return response.toString();
     }
@@ -52,7 +61,7 @@ public class YahooFinance {
         reader.close();
         return jo;
     }
-
+    /*
     public void fetchAssetName(Asset asset) {
         YahooFinance yahoo = new YahooFinance();
         List<String> symbols = new ArrayList<>();
@@ -62,6 +71,7 @@ public class YahooFinance {
         JsonObject jo = yahoo.convert(jsonResponse);
         asset.setName(extractName(jo));
     }
+     */
 
     private String extractName(JsonObject jo) {
         String returnName = "";
@@ -73,14 +83,14 @@ public class YahooFinance {
         return returnName;
     }
 
-    public YahooResponse getCurrentData(List<String> tickers) {
+    public YahooResponse getCurrentData(List<String> tickers) throws YahooException {
         String jsonResponse = requestData(tickers);
         ObjectMapper objectMapper = new ObjectMapper();
         YahooResponse result = null;
         try {
              result  = objectMapper.readValue(jsonResponse, YahooResponse.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new YahooException("Problem with JSON file!");
         }
         return result;
     }

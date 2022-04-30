@@ -4,6 +4,7 @@ package stockanalyzer.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import stockanalyzer.ctrl.Controller;
 
@@ -13,32 +14,56 @@ public class UserInterface
 	private Controller ctrl = new Controller();
 
 	public void getDataFromCtrl1(){
-		ctrl.process("ABC");
+		try {
+			ctrl.process("AAPL");
+		} catch (YahooException y) {
+			System.out.println(y.getMessage());
+		}
 	}
 
-	public void getDataFromCtrl2(){
+	public void getDataFromCtrl2() {
+		try {
+			ctrl.process("AMZN");
+		} catch (YahooException y) {
+			System.out.println(y.getMessage());
+		}
 	}
 
-	public void getDataFromCtrl3(){
-
-	}
-	public void getDataFromCtrl4(){
-
+	public void getDataFromCtrl3() {
+		try {
+			ctrl.process("FB");
+		} catch (YahooException y) {
+			System.out.println(y.getMessage());
+		}
 	}
 	
 	public void getDataForCustomInput() {
-		
+		System.out.print("Enter the desired stock symbol(s), separated by a comma, without spaces: ");
+		Scanner scanner = new Scanner(System.in);
+		String ticker = scanner.next();
+		try {
+			ctrl.process(ticker);
+		} catch (YahooException y) {
+			System.out.println(y.getMessage());
+		}
 	}
 
+	public void getDataFromCtrl4() {
+		try {
+			ctrl.process("AAPL,AMZN,FB");
+		}catch (YahooException y){
+			System.out.println(y.getMessage());
+		}
+	}
 
 	public void start() {
-		Menu<Runnable> menu = new Menu<>("User Interfacx");
+		Menu<Runnable> menu = new Menu<>("User Interface");
 		menu.setTitel("Wählen Sie aus:");
-		menu.insert("a", "Choice 1", this::getDataFromCtrl1);
-		menu.insert("b", "Choice 2", this::getDataFromCtrl2);
-		menu.insert("c", "Choice 3", this::getDataFromCtrl3);
-		menu.insert("d", "Choice User Imput:",this::getDataForCustomInput);
-		menu.insert("z", "Choice User Imput:",this::getDataFromCtrl4);
+		menu.insert("a", "Apple", this::getDataFromCtrl1);
+		menu.insert("b", "Amazon", this::getDataFromCtrl2);
+		menu.insert("c", "Facebook", this::getDataFromCtrl3);
+		menu.insert("d", "Stock of your choice",this::getDataForCustomInput);
+		menu.insert("z", "All data of Apple, Amazon, and Facebook at once",this::getDataFromCtrl4);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
@@ -56,6 +81,7 @@ public class UserInterface
 		try {
 			value = inReader.readLine();
 		} catch (IOException e) {
+			System.out.println("Wrong input!");
 		}
 		return value.trim();
 	}
