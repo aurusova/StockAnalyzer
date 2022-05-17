@@ -4,14 +4,19 @@ package stockanalyzer.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 import stockanalyzer.ctrl.Controller;
+import stockanalyzer.downloader.SequentialDownloader;
 
 public class UserInterface 
 {
 
 	private Controller ctrl = new Controller();
+	private SequentialDownloader downloader = new SequentialDownloader();
 
 	public void getDataFromCtrl1(){
 		try {
@@ -56,6 +61,12 @@ public class UserInterface
 		}
 	}
 
+	public void getDataFromCtrl5() {
+		List<String> tickers = new ArrayList<>();
+		Collections.addAll(tickers, "AAPL", "AMZN", "FB");
+		downloader.process(tickers);
+	}
+
 	public void start() {
 		Menu<Runnable> menu = new Menu<>("User Interface");
 		menu.setTitel("Wählen Sie aus:");
@@ -64,6 +75,7 @@ public class UserInterface
 		menu.insert("c", "Facebook", this::getDataFromCtrl3);
 		menu.insert("d", "Stock of your choice",this::getDataForCustomInput);
 		menu.insert("z", "All data of Apple, Amazon, and Facebook at once",this::getDataFromCtrl4);
+		menu.insert("s", "Download tickers",this::getDataFromCtrl5);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
