@@ -69,16 +69,12 @@ public class UserInterface
 		long startTime = System.currentTimeMillis();
 		sequentialDownloader.process(tickers);
 		long endTime = System.currentTimeMillis();
-		System.out.println("Time elapsed: " + (endTime-startTime) + " ms");
-	}
+		System.out.println("Time elapsed sequentially: " + (endTime-startTime) + " ms");
 
-	public void getDataFromCtrl6() {
-		List<String> tickers = new ArrayList<>();
-		Collections.addAll(tickers, "AAPL", "AMZN", "FB");
-		long startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 		parallelDownloader.process(tickers);
-		long endTime = System.currentTimeMillis();
-		System.out.println("Time elapsed: " + (endTime-startTime) + " ms");
+		endTime = System.currentTimeMillis();
+		System.out.println("Time elapsed parallelly: " + (endTime-startTime) + " ms");
 	}
 
 	public void start() {
@@ -89,8 +85,7 @@ public class UserInterface
 		menu.insert("c", "Facebook", this::getDataFromCtrl3);
 		menu.insert("d", "Stock of your choice",this::getDataForCustomInput);
 		menu.insert("z", "All data of Apple, Amazon, and Facebook at once",this::getDataFromCtrl4);
-		menu.insert("s", "Download tickers sequentially",this::getDataFromCtrl5);
-		menu.insert("p", "Download tickers parallelly",this::getDataFromCtrl6);
+		menu.insert("s", "Download tickers",this::getDataFromCtrl5);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
